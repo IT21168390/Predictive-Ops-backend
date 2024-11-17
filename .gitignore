@@ -161,3 +161,4 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 preprocessor/key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json
+preprocessor/config.py
