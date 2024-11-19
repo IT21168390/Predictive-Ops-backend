@@ -1,6 +1,8 @@
 from collections import deque, defaultdict
 from datetime import datetime
 import pytz
+from collections import Counter
+from firebase_handler import store_anomaly_record
 
 
 
@@ -78,7 +80,7 @@ async def process_event(event_body):
 
     processed_data = {}
 
-    
+
 
     raw_data["vibration_1_null_flag"] = event_body.get("vibration_1_null_flag")
     raw_data["vibration_2_null_flag"] = event_body.get("vibration_2_null_flag")
@@ -123,6 +125,34 @@ async def process_event(event_body):
     anomaly_flags["temperature_anomaly_flag"] = event_body.get("temperature_anomaly_flag")
     anomaly_flags["rpm_anomaly_flag"] = event_body.get("rpm_anomaly_flag")
 
+    # Anomaly or Null detection
+    anomalies_detected = [
+        key for key, value in anomaly_flags.items() if value == "Anomaly"
+    ]
+    null_detected = [
+        key for key, value in null_flags.items() if value
+    ]
+
+    if anomalies_detected or null_detected:
+        anomaly_record = {
+            "timestamp": sri_lankan_time.isoformat(),
+            "sensor_data": raw_data,
+            "anomalies": anomalies_detected,
+            "nulls": null_detected
+        }
+        await store_anomaly_record(anomaly_record["timestamp"], anomaly_record["anomalies"], anomaly_record["nulls"], anomaly_record["sensor_data"])
+
+        # Check for email threshold
+        # total_checks = len(raw_data["anomaly_flags"]) + len(raw_data["null_flags"])
+        # anomaly_count = len(anomalies_detected) + len(null_detected)
+        # if anomaly_count / total_checks > 0.5:
+        #     send_detailed_anomaly_email(
+        #         "Anomaly Alert Report",
+        #         f"More than 50% anomalies detected.\n\nDetails:\n{anomaly_record}"
+        #     )
+
+    
+
 
 
 
@@ -145,6 +175,13 @@ async def process_event(event_body):
             total_readings += 1
             if null_flag or anomaly_flag:
                 anomaly_count += 1
+
+    # If anomalies or nulls exceed 50%, send an email
+    if total_readings > 0 and (anomaly_count / total_readings) > 0.5:
+        report = generate_anomaly_report(rolling_buffer)
+        subject = "Critical Alert: High Anomaly Count Detected"
+        #send_anomaly_email(subject, report)
+
 
     
     return {
