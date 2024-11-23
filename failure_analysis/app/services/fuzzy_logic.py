@@ -46,7 +46,14 @@ extended_cause_system = ctrl.ControlSystemSimulation(extended_cause_ctrl)
 def diagnose_extended(temp, vib, noise_level=None, alignment_status=None, overheating_status=None):
     extended_cause_system.input['temperature'] = temp
     extended_cause_system.input['vibration'] = vib
-
+    
+    # Dynamically add observations
+    if noise_level is not None:
+        extended_cause_system.input['noise'] = 1 if noise_level == 'yes' else 0
+    if alignment_status is not None:
+        extended_cause_system.input['alignment'] = 1 if alignment_status == 'misaligned' else 0
+    if overheating_status is not None:
+        extended_cause_system.input['overheating'] = 1 if overheating_status == 'yes' else 0
 
     # Compute results
     extended_cause_system.compute()
