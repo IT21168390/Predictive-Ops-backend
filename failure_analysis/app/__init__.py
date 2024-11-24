@@ -16,4 +16,8 @@ def create_app():
 
     mongo.init_app(app)
 
+    from app.routes import instructions, diagnostics
+    app.register_blueprint(instructions.bp)
+    app.register_blueprint(diagnostics.bp)
+
     return app
