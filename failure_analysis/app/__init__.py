@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_pymongo import PyMongo
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
@@ -16,9 +17,10 @@ def create_app():
 
     mongo.init_app(app)
 
-    from app.routes import instructions, diagnostics, analytics
+    from app.routes import instructions, diagnostics, analytics, correlations
     app.register_blueprint(instructions.bp)
     app.register_blueprint(diagnostics.bp)
     app.register_blueprint(analytics.bp)
+    app.register_blueprint(correlations.bp)
 
     return app
