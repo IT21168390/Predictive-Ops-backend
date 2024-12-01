@@ -2,6 +2,9 @@ from collections import deque, defaultdict
 from datetime import datetime
 import pytz
 from collections import Counter
+from helpers.anomaly import handle_anomalies, handle_outliers, validate_and_correct
+from helpers.statistics import compute_statistics
+#from email_handler import send_anomaly_email, send_detailed_anomaly_email
 from firebase_handler import store_anomaly_record
 
 
@@ -80,7 +83,28 @@ async def process_event(event_body):
 
     processed_data = {}
 
+    # Anomaly Handling
+    # for sensor, value in raw_data.items():
+    #     if sensor not in rolling_data:
+    #         rolling_data[sensor] = deque(maxlen=30) # 5 min rolling window (30 samples every 10 seconds)
+    #     rolling_data[sensor].append(value)
+    #     #rolling_data[sensor] = handle_outliers(list(rolling_data[sensor]))
+    #     cleaned_data = handle_outliers(list(rolling_data[sensor]))
+    #     processed_data[sensor] = cleaned_data[-1]  # Use the latest processed value
+    # Anomaly Handling with validation and correction
+    for sensor, value in raw_data.items():
+        if value is not None:  # Only process non-null values
+            sensor_type = sensor.split('_')[0]  # Extract base sensor type
+            if sensor_type in VALID_RANGES:
+                if sensor not in rolling_data:
+                    rolling_data[sensor] = deque(maxlen=30)  # Rolling window
+                rolling_data[sensor].append(value)
+                range_min, range_max = VALID_RANGES[sensor_type]
+                corrected_values = validate_and_correct(list(rolling_data[sensor]), range_min, range_max)
+                processed_data[sensor] = corrected_values[-1]  # Use latest corrected value
 
+    # Compute statistics
+    stats_data = {sensor: compute_statistics(values) for sensor, values in rolling_data.items()}
 
     raw_data["vibration_1_null_flag"] = event_body.get("vibration_1_null_flag")
     raw_data["vibration_2_null_flag"] = event_body.get("vibration_2_null_flag")
@@ -183,9 +207,26 @@ async def process_event(event_body):
         #send_anomaly_email(subject, report)
 
 
+
+
+
+
+
+
+    stats_data["vibration_1_null_flag"] = event_body.get("vibration_1_null_flag")
+    stats_data["vibration_2_null_flag"] = event_body.get("vibration_2_null_flag")
+    stats_data["vibration_3_null_flag"] = event_body.get("vibration_3_null_flag")
+    stats_data["temperature_null_flag"] = event_body.get("temperature_null_flag")
+    stats_data["rpm_1_null_flag"] = event_body.get("rpm_1_null_flag")
+
+    stats_data["vibration_anomaly_flag"] = event_body.get("vibration_anomaly_flag")
+    stats_data["temperature_anomaly_flag"] = event_body.get("temperature_anomaly_flag")
+    stats_data["rpm_anomaly_flag"] = event_body.get("rpm_anomaly_flag")
+    stats_data["overall_health_status"] = event_body.get("overall_health_status")
     
     return {
         "timestamp": sri_lankan_time.isoformat(),
         #"raw_data": raw_data,
-        "processed_data": processed_data
+        "processed_data": processed_data,
+        "statistics": stats_data,
     }
