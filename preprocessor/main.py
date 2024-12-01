@@ -134,8 +134,20 @@ import socketio
 import uvicorn
 from fastapi import FastAPI
 
+# FastAPI and Socket.IO setup
+app = FastAPI()
+sio = socketio.AsyncServer(async_mode='asgi', 
+                           cors_allowed_origins="*" # ["http://localhost:3000"],  # Allow localhost:3000
+                           )  # Explicitly set async_mode to 'asgi'
+sio_app = socketio.ASGIApp(sio, app)
 
+app.mount("/socket.io", sio_app)
+# # Create a Socket.IO server instance
+# sio = socketio.AsyncServer()
+# app = FastAPI()
 
+# # Attach the Socket.IO server to the FastAPI app
+# app.mount("/socket.io", socketio.ASGIApp(sio, app))
 
 async def on_event(partition_context, event: EventData):
     try:
