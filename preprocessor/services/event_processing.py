@@ -34,7 +34,7 @@ def generate_anomaly_report(rolling_buffer):
 VALID_RANGES = {
     "vibration": (0, 10),
     "temperature": (27, 80),
-    "rpm": (350, 450),
+    "rpm": (300, 450),
 }
 
 rolling_data = {}
