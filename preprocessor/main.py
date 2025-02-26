@@ -149,7 +149,10 @@ app.mount("/socket.io", sio_app)
 # # Attach the Socket.IO server to the FastAPI app
 # app.mount("/socket.io", socketio.ASGIApp(sio, app))
 
+latest_data = {}
+
 async def on_event(partition_context, event: EventData):
+    global latest_data
     try:
         event_body = event.body_as_json()
         print(f"Data: {event.body_as_json()}")
@@ -181,6 +184,14 @@ async def on_event(partition_context, event: EventData):
 
         processed_data = await process_event(event_body)
         
+        latest_data = {
+            "vibration_1": event_body.get("vibration_1"),
+            "vibration_2": event_body.get("vibration_2"),
+            "vibration_3": event_body.get("vibration_3"),
+            "temperature": event_body.get("temperature"),
+            "rpm_1": event_body.get("rpm_1"),
+        }
+
         await send_to_raw_pipeline(raw_data)
         await send_to_processed_pipeline(processed_data)
         #print(f"Processed and forwarded data: {processed_data}")
@@ -197,6 +208,15 @@ async def start_eventhub_client():
     async with client:
         print("Listening for events...")
         await client.receive(on_event=on_event, starting_position="@latest")
+
+
+async def emit_data_to_frontend():
+    while True:
+        if latest_data:
+            print(f"Sending data to frontend: {latest_data}")
+            await sio.emit("predict_data", latest_data)
+        await asyncio.sleep(60)  
+
 
 # Event for connecting clients
 @sio.event
@@ -221,6 +241,8 @@ async def send_to_processed_pipeline(data):
 async def run():
     # Start the EventHub client
     eventhub_client = asyncio.create_task(start_eventhub_client())
+
+    emit_task = asyncio.create_task(emit_data_to_frontend())
     
     # Start the FastAPI server
     config = uvicorn.Config(app, host="0.0.0.0", port=8000)
@@ -228,7 +250,7 @@ async def run():
     server_task = asyncio.create_task(server.serve())
 
     # Wait for both tasks to finish
-    await asyncio.gather(eventhub_client, server_task)
+    await asyncio.gather(eventhub_client, emit_task, server_task)
 
 if __name__ == "__main__":
     # Run both the FastAPI server and the EventHub client concurrently
