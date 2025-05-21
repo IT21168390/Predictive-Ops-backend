@@ -42,18 +42,6 @@ async def store_anomaly_record(timestamp, anomalies, nulls, sensorData):
         print(f"Failed to store anomaly record: {e}")
 
 
-# def fetch_historical_data(sensor, start_date, end_date):
-#     try:
-#         records = db.collection("processed_data").where(
-#             "sensor", "==", sensor
-#         ).where(
-#             "timestamp", ">=", start_date
-#         ).where(
-#             "timestamp", "<=", end_date
-#         ).stream()
-#         return [record.to_dict() for record in records]
-#     except Exception as e:
-#         print(f"Failed to fetch historical data: {e}")
 def fetch_historical_anomalies(sensor=None, anomaly_type=None, start_date=None, end_date=None):
     try:
         query = db.collection("anomalies")
@@ -71,13 +59,6 @@ def fetch_historical_anomalies(sensor=None, anomaly_type=None, start_date=None, 
 
 
 
-# def store_data(collection, document, data):
-#     """Store data in Firestore."""
-#     db.collection(collection).document(document).set(data)
-
-# def add_anomaly_record(record):
-#     """Add anomaly record."""
-#     db.collection("anomalies").add(record)
 
 def get_historical_data(sensor_type, start_time, end_time):
     """Query historical data for analysis."""
