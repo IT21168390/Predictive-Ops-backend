@@ -5,7 +5,7 @@ import statistics
 def handle_anomalies(data: List[float], threshold_min: float, threshold_max: float) -> List[float]:
     valid_data = [d for d in data if threshold_min <= d <= threshold_max]
     if not valid_data:  # All values are anomalous
-        return [float('nan')] * len(data)
+        return [float('0')] * len(data)
     mean_value = statistics.mean(valid_data)
     return [mean_value if d < threshold_min or d > threshold_max else d for d in data]
 
