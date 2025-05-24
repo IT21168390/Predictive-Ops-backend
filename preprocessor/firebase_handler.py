@@ -1,15 +1,7 @@
 import firebase_admin
 from firebase_admin import credentials, firestore
-from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent            # …/preprocessor
-CERT_PATH = BASE_DIR / "key" / (
-    "predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json"
-)
-
-cred = credentials.Certificate(str(CERT_PATH))
-
-#cred = credentials.Certificate("key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json")
+cred = credentials.Certificate("key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json")
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
