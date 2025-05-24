@@ -1,11 +1,3 @@
-# FROM python:3.12.4
-# WORKDIR /pdm
-# COPY . .
-# RUN pip install --upgrade pip
-# RUN pip install --no-cache-dir -r requirements.txt
-# EXPOSE 8000
-# CMD [ "gunicorn", "--bind", "0.0.0.0:5000", "run:preprocessor/main.py" ]
-
 FROM python:3.12.10-slim
 
 # ---- system ---------------------------------------------------------------
