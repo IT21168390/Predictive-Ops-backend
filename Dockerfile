@@ -15,6 +15,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # ---- code -----------------------------------------------------------------
 COPY . .
 
+# Create the key directory structure
+RUN mkdir -p /app/preprocessor/key
+
 # FastAPI listens on :8000
 EXPOSE 8000
 
