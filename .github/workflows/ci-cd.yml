@@ -54,14 +54,14 @@ jobs:
 
                 services:
                     preprocessor:
-                    image: ${{ env.IMAGE_NAME }}:${{ env.TAG }}
-                    restart: always
-                    ports:
-                        - "8000:8000"
-                    env_file:
-                        - /opt/preprocessor/.env
-                    volumes:
-                        - /opt/preprocessor/firebase_key.json:/app/preprocessor/key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json:ro
+                        image: ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+                        restart: always
+                        ports:
+                            - "8000:8000"
+                        env_file:
+                            - /opt/preprocessor/.env
+                        volumes:
+                            - /opt/preprocessor/firebase_key.json:/app/preprocessor/key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json:ro
                 EOF
 
                 echo "Deploying on EC2..."
