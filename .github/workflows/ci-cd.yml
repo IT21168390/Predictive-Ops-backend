@@ -73,6 +73,17 @@ jobs:
 
                 aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
+                # Stop and remove old container if exists
+                if [ "$(docker ps -aq -f name=preprocessor)" ]; then
+                    docker compose -f /opt/preprocessor/docker-compose.yml down
+                fi
+
+                # Remove old image
+                docker image rm -f ${{ env.IMAGE_NAME }}:${{ env.TAG }} || true
+
+                # Clean up dangling images
+                docker image prune -f
+
                 cd /opt/preprocessor
                 docker pull ${{ env.IMAGE_NAME }}:${{ env.TAG }}
                 docker compose up -d --pull=always
