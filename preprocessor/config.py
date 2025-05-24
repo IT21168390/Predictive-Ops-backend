@@ -6,7 +6,7 @@ load_dotenv()
 EVENT_HUB_CONNECTION_STRING = os.getenv("EVENT_HUB_CONNECTION_STRING")
 EVENT_HUB_NAME = os.getenv("EVENT_HUB_NAME")
 
-CONSUMER_GROUP = os.getenv("CONSUMER_GROUP")
+CONSUMER_GROUP = "$Default"
 ROLLING_WINDOW_SIZE = os.getenv("ROLLING_WINDOW_SIZE")  # Number of samples in the rolling window
 
 # Email Config
