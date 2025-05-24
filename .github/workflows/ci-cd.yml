@@ -61,7 +61,7 @@ jobs:
                         env_file:
                             - /opt/preprocessor/.env
                         volumes:
-                            - /opt/preprocessor/firebase_key.json:/app/preprocessor/key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json:ro
+                            - /opt/preprocessor/firebase_key.json:/app/key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json:ro
                 EOF
 
                 echo "Deploying on EC2..."
