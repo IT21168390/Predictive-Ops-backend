@@ -1,0 +1,89 @@
+name: CI/CD - Preprocessor
+
+on:
+  push:
+    branches: [ "demo" ]
+
+env:
+  IMAGE_NAME: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPO_NAME }}
+  TAG: latest
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/demo'
+
+    steps:
+      - name: SSH to EC2 and deploy
+        uses: appleboy/ssh-action@v1
+        with:
+            host: ${{ secrets.EC2_HOST }}
+            username: ${{ secrets.EC2_USER }}
+            key: ${{ secrets.EC2_SSH_KEY }}
+            script: |
+                echo '${{ secrets.FIREBASE_CREDENTIALS_B64 }}' | base64 -d > firebase_key.json
+                echo '${{ secrets.ENV_FILE_CONTENT }}' > .env
+
+                echo "Creating docker-compose.yml..."
+                cat <<EOF > docker-compose.yml
+                version: "3.9"
+
+                services:
+                    preprocessor:
+                        image: ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+                        restart: always
+                        ports:
+                            - "8000:8000"
+                        env_file:
+                            - /opt/preprocessor/.env
+                        volumes:
+                            - /opt/preprocessor/firebase_key.json:/app/preprocessor/key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json:ro
+                EOF
+
+                echo "Deploying on EC2..."
+                sudo mkdir -p /opt/preprocessor
+                sudo mv firebase_key.json /opt/preprocessor/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json
+                sudo mv .env /opt/preprocessor/.env
+                sudo mv docker-compose.yml /opt/preprocessor/docker-compose.yml
+                sudo chmod 600 /opt/preprocessor/*.json /opt/preprocessor/.env
+
+                aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+                # Stop and remove old container if exists
+                if [ "$(docker ps -aq -f name=preprocessor)" ]; then
+                    docker compose -f /opt/preprocessor/docker-compose.yml down
+                fi
+
+                # Remove old image
+                docker image rm -f ${{ env.IMAGE_NAME }}:${{ env.TAG }} || true
+
+                # Clean up dangling images
+                docker image prune -f
+
+                cd /opt/preprocessor
+                docker pull ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+                docker compose up -d --pull=always
