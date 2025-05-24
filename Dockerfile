@@ -15,10 +15,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # ---- code -----------------------------------------------------------------
 COPY . .
 
-# Ensure the key directory exists and create a placeholder file
-# This prevents Docker from creating the mount point as a directory
-RUN mkdir -p /app/preprocessor/key && \
-    touch /app/preprocessor/key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json
+# Create the key directory structure
+RUN mkdir -p /app/preprocessor/key
 
 # FastAPI listens on :8000
 EXPOSE 8000
