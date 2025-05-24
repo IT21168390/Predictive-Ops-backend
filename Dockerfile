@@ -6,7 +6,7 @@
 # EXPOSE 8000
 # CMD [ "gunicorn", "--bind", "0.0.0.0:5000", "run:preprocessor/main.py" ]
 
-FROM python:3.12.10
+FROM python:3.12.10-slim
 
 # ---- system ---------------------------------------------------------------
 RUN apt-get update && apt-get install -y --no-install-recommends \
