@@ -1,4 +1,4 @@
-name: CI/CD – Preprocessor
+name: CI/CD - Preprocessor
 
 on:
   push:
@@ -38,51 +38,48 @@ jobs:
     if: github.ref == 'refs/heads/demo'
 
     steps:
-      - name: Prepare deploy.sh for EC2
-        run: |
-          echo '${{ secrets.FIREBASE_CREDENTIALS_B64 }}' | base64 -d > firebase_key.json
-          echo '${{ secrets.ENV_FILE_CONTENT }}' > .env
-
-          cat <<EOF > docker-compose.yml
-          version: "3.9"
-
-          services:
-            preprocessor:
-              image: $IMAGE_NAME:$TAG
-              restart: always
-              ports:
-                - "8000:8000"
-              env_file:
-                - /opt/preprocessor/.env
-              volumes:
-                - /opt/preprocessor/firebase_key.json:/app/preprocessor/key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json:ro
-          EOF
-
-          cat <<'EOD' > deploy.sh
-          set -e
-          sudo mkdir -p /opt/preprocessor
-          sudo mv firebase_key.json /opt/preprocessor/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json
-          sudo mv .env /opt/preprocessor/.env
-          sudo chmod 600 /opt/preprocessor/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json /opt/preprocessor/.env
-
-          docker login ${{ env.IMAGE_NAME }} -u AWS -p $(aws ecr get-login-password --region ${{ secrets.AWS_REGION }})
-          cd /opt/preprocessor
-          docker pull $IMAGE_NAME:$TAG
-          docker compose up -d --pull=always
-          EOD
-
-          chmod +x deploy.sh
-
       - name: SSH to EC2 and deploy
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            IMAGE_NAME=${{ env.IMAGE_NAME }}
-            TAG=${{ env.TAG }}
-            $(cat deploy.sh)
+            host: ${{ secrets.EC2_HOST }}
+            username: ${{ secrets.EC2_USER }}
+            key: ${{ secrets.EC2_SSH_KEY }}
+            script: |
+                echo '${{ secrets.FIREBASE_CREDENTIALS_B64 }}' | base64 -d > firebase_key.json
+                echo '${{ secrets.ENV_FILE_CONTENT }}' > .env
+
+                echo "Creating docker-compose.yml..."
+                cat <<EOF > docker-compose.yml
+                version: "3.9"
+
+                services:
+                    preprocessor:
+                    image: ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+                    restart: always
+                    ports:
+                        - "8000:8000"
+                    env_file:
+                        - /opt/preprocessor/.env
+                    volumes:
+                        - /opt/preprocessor/firebase_key.json:/app/preprocessor/key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json:ro
+                EOF
+
+                echo "Setting up deployment on EC2..."
+                ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'REMOTE'
+                    set -e
+                    sudo mkdir -p /opt/preprocessor
+                    sudo mv firebase_key.json /opt/preprocessor/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json
+                    sudo mv .env /opt/preprocessor/.env
+                    sudo mv docker-compose.yml /opt/preprocessor/docker-compose.yml
+                    sudo chmod 600 /opt/preprocessor/*.json /opt/preprocessor/.env
+
+                    aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+                    cd /opt/preprocessor
+                    docker pull ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+                    docker compose up -d --pull=always
+                REMOTE
+
 
 
 
