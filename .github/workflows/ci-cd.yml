@@ -64,21 +64,18 @@ jobs:
                         - /opt/preprocessor/firebase_key.json:/app/preprocessor/key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json:ro
                 EOF
 
-                echo "Setting up deployment on EC2..."
-                ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'REMOTE'
-                    set -e
-                    sudo mkdir -p /opt/preprocessor
-                    sudo mv firebase_key.json /opt/preprocessor/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json
-                    sudo mv .env /opt/preprocessor/.env
-                    sudo mv docker-compose.yml /opt/preprocessor/docker-compose.yml
-                    sudo chmod 600 /opt/preprocessor/*.json /opt/preprocessor/.env
+                echo "Deploying on EC2..."
+                sudo mkdir -p /opt/preprocessor
+                sudo mv firebase_key.json /opt/preprocessor/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json
+                sudo mv .env /opt/preprocessor/.env
+                sudo mv docker-compose.yml /opt/preprocessor/docker-compose.yml
+                sudo chmod 600 /opt/preprocessor/*.json /opt/preprocessor/.env
 
-                    aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+                aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
-                    cd /opt/preprocessor
-                    docker pull ${{ env.IMAGE_NAME }}:${{ env.TAG }}
-                    docker compose up -d --pull=always
-                REMOTE
+                cd /opt/preprocessor
+                docker pull ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+                docker compose up -d --pull=always
 
 
 
