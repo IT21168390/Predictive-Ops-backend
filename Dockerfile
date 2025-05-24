@@ -18,4 +18,7 @@ COPY . .
 # FastAPI listens on :8000
 EXPOSE 8000
 
-CMD ["python", "-m", "preprocessor.main"]
+# CMD ["python", "-m", "preprocessor.main"]
+
+# Change this line - run main.py directly from the preprocessor directory
+CMD ["python", "preprocessor/main.py"]
