@@ -61,12 +61,12 @@ jobs:
                         env_file:
                             - /opt/preprocessor/.env
                         volumes:
-                            - /opt/preprocessor/firebase_key.json:/app/key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json:ro
+                            - /opt/preprocessor/firebase_key.json:/app/preprocessor/key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json:ro
                 EOF
 
                 echo "Deploying on EC2..."
                 sudo mkdir -p /opt/preprocessor
-                sudo mv firebase_key.json /opt/preprocessor/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json
+                sudo mv firebase_key.json /opt/preprocessor/firebase_key.json
                 sudo mv .env /opt/preprocessor/.env
                 sudo mv docker-compose.yml /opt/preprocessor/docker-compose.yml
                 sudo chmod 600 /opt/preprocessor/*.json /opt/preprocessor/.env
