@@ -18,7 +18,11 @@ COPY . .
 # FastAPI listens on :8000
 EXPOSE 8000
 
+RUN mkdir -p /app/preprocessor/key
+# Copy the JSON secret into the expected path inside the container
+COPY preprocessor/key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json /app/preprocessor/key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json
+
 # CMD ["python", "-m", "preprocessor.main"]
 
 # Change this line - run main.py directly from the preprocessor directory
-CMD ["python", "preprocessor/main.py"]
+CMD ["python", "main.py"]

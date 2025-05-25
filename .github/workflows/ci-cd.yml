@@ -25,6 +25,12 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Add Firebase key to build context
+        run: |
+          mkdir -p preprocessor/key
+          echo '${{ secrets.FIREBASE_CREDENTIALS_B64 }}' | base64 -d > preprocessor/key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json
+
+
       - name: Build & push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -45,7 +51,6 @@ jobs:
             username: ${{ secrets.EC2_USER }}
             key: ${{ secrets.EC2_SSH_KEY }}
             script: |
-                echo '${{ secrets.FIREBASE_CREDENTIALS_B64 }}' | base64 -d > firebase_key.json
                 echo '${{ secrets.ENV_FILE_CONTENT }}' > .env
 
                 echo "Creating docker-compose.yml..."
@@ -60,13 +65,10 @@ jobs:
                             - "8000:8000"
                         env_file:
                             - /opt/preprocessor/.env
-                        volumes:
-                            - /opt/preprocessor/firebase_key.json:/app/preprocessor/key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json:ro
                 EOF
 
                 echo "Deploying on EC2..."
                 sudo mkdir -p /opt/preprocessor
-                sudo mv firebase_key.json /opt/preprocessor/firebase_key.json
                 sudo mv .env /opt/preprocessor/.env
                 sudo mv docker-compose.yml /opt/preprocessor/docker-compose.yml
                 sudo chmod 600 /opt/preprocessor/*.json /opt/preprocessor/.env
