@@ -25,4 +25,4 @@ COPY preprocessor/key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2ae
 # CMD ["python", "-m", "preprocessor.main"]
 
 # Change this line - run main.py directly from the preprocessor directory
-CMD ["python", "preprocessor/main.py"]
+CMD ["python", "main.py"]
