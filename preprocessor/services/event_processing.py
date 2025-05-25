@@ -2,10 +2,10 @@ from collections import deque, defaultdict
 from datetime import datetime
 import pytz
 from collections import Counter
-from helpers.anomaly import handle_anomalies, handle_outliers, validate_and_correct
-from helpers.statistics import compute_statistics
+from ..helpers.anomaly import handle_anomalies, handle_outliers, validate_and_correct
+from ..helpers.statistics import compute_statistics
 #from email_handler import send_anomaly_email, send_detailed_anomaly_email
-from firebase_handler import store_anomaly_record
+from ..firebase_handler import store_anomaly_record
 from email_handler import send_anomaly_email
 
 
