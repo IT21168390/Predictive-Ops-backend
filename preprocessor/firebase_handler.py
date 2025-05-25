@@ -7,7 +7,7 @@ CERT_PATH = BASE_DIR / "key" / (
     "predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json"
 )
 
-cred = credentials.Certificate(CERT_PATH)
+cred = credentials.Certificate(str(CERT_PATH))
 
 #cred = credentials.Certificate("key/predictivemaintenancesystem-firebase-adminsdk-w2tny-15b2aec14c.json")
 firebase_admin.initialize_app(cred)
