@@ -1,0 +1,45 @@
+# Virtual Environment
+venv/
+*.pyc
+__pycache__/
+
+# IDE - VSCode
+.vscode/
+*.code-workspace
+.history/
+
+# Flask
+instance/
+.webassets-cache
+
+# MongoDB
+*.mongodb
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Logs
+*.log
+logs/
+
+# Coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+coverage.xml
+*.cover
+
+# Mac OS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Unit test / coverage reports
+htmlcov/
+.coverage
+.pytest_cache/
