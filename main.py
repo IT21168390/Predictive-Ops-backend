@@ -104,11 +104,13 @@ async def on_event(partition_context, event: EventData):
             "vibration_3": event_body.get("vibration_3"),
             "temperature": event_body.get("temperature"),
             "rpm": event_body.get("rpm_1"),
+
             "vibration_1_null_flag": event_body.get("vibration_1_null_flag"),
             "vibration_2_null_flag": event_body.get("vibration_2_null_flag"),
             "vibration_3_null_flag": event_body.get("vibration_3_null_flag"),
             "temperature_null_flag": event_body.get("temperature_null_flag"),
             "rpm_1_null_flag": event_body.get("rpm_1_null_flag"),
+
             "vibration_anomaly_flag": event_body.get("vibration_anomaly_flag"),
             "temperature_anomaly_flag": event_body.get("temperature_anomaly_flag"),
             "rpm_anomaly_flag": event_body.get("rpm_anomaly_flag"),
@@ -126,8 +128,9 @@ async def on_event(partition_context, event: EventData):
         }
 
         await send_to_raw_pipeline(raw_data)
+        #if (processed_data["vibration_1"] or processed_data["vibration_1"] == null)
         await send_to_processed_pipeline(processed_data)
-        
+        #print(f"Processed and forwarded data: {processed_data}")
     except Exception as e:
         print(f"Error processing event: {str(e)}")
 
@@ -142,28 +145,33 @@ async def start_eventhub_client():
         print("Listening for events...")
         await client.receive(on_event=on_event, starting_position="@latest")
 
+
 async def emit_data_to_frontend():
     while True:
         if latest_data:
             print(f"Sending data to frontend: {latest_data}")
             await sio.emit("predict_data", latest_data)
-        await asyncio.sleep(60)
+        await asyncio.sleep(60)  
 
+
+# Function to send raw data in real time
 async def send_to_raw_pipeline(data):
     """Function to send raw data in real time"""
     print(f"Raw Data: {data}")
     await sio.emit('raw_data', data)
 
+# Function to send processed data in real time
 async def send_to_processed_pipeline(data):
     """Function to send processed data in real time"""
     print(f"Processed Data: {data}")
     await sio.emit('processed_data', data)
 
-# Socket.IO events
+# Socket.IO event for connecting clients
 @sio.event
 async def connect(sid, environ):
     print(f"Client connected: {sid}")
 
+# Event for disconnecting clients
 @sio.event
 async def disconnect(sid):
     print(f"Client disconnected: {sid}")
@@ -216,4 +224,6 @@ except Exception as e:
     sys.exit(1)
 
 if __name__ == "__main__":
+    # Run both the FastAPI server and the EventHub client concurrently
     asyncio.run(main())
+    

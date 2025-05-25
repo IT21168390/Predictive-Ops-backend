@@ -6,7 +6,7 @@ from ..helpers.anomaly import handle_anomalies, handle_outliers, validate_and_co
 from ..helpers.statistics import compute_statistics
 #from email_handler import send_anomaly_email, send_detailed_anomaly_email
 from ..firebase_handler import store_anomaly_record
-from email_handler import send_anomaly_email
+from ..email_handler import send_anomaly_email
 
 
 
