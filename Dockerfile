@@ -1,4 +1,4 @@
-FROM python:3.12.10-slim
+FROM python:3.11-slim
 
 # ---- system ---------------------------------------------------------------
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -17,6 +17,7 @@ COPY . .
 
 # FastAPI listens on :8000
 EXPOSE 8000
+EXPOSE 5000
 
 RUN mkdir -p /app/preprocessor/key
 # Copy the JSON secret into the expected path inside the container

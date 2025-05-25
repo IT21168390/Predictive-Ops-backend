@@ -63,6 +63,7 @@ jobs:
                         restart: always
                         ports:
                             - "8000:8000"
+                            - "5000:5000"
                         env_file:
                             - /opt/preprocessor/.env
                 EOF
