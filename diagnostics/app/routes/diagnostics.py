@@ -23,7 +23,7 @@ def diagnose():
         # Diagnose step-by-step
         criticality = diagnose_extended(temp, vib, noise, alignment, overheating)
 
-        response = requests.get(f"http://127.0.0.1:5000/instructions/failure/{type}")
+        response = requests.get(f"http://51.21.194.188:5000/instructions/failure/{type}")
         if response.status_code == 200:
             instructions = response.json().get('instructions', "No instructions available.")
         else:
