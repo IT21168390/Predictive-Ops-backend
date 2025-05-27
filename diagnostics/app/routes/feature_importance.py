@@ -3,7 +3,7 @@ from ..utils.validation import validate_input_data
 import joblib
 import os
 
-feature_importance_bp = Blueprint('feature_importance', __name__, url_prefix='/model')
+feature_importance_bp = Blueprint('feature_importance', __name__)
 
 # Configure model path and load model
 MODEL_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "models", "model.pkl")

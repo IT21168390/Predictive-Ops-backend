@@ -7,7 +7,7 @@ import shap
 import joblib
 import os
 
-analytics_bp = Blueprint('analytics', __name__, url_prefix='/analytics')
+analytics_bp = Blueprint('analytics', __name__)
 service = FailureAnalysisService()
 
 # Load model and create SHAP explainer
