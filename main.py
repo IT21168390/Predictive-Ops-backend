@@ -39,13 +39,7 @@ flask_app = Flask(__name__)
 # Configure CORS for Flask
 CORS(flask_app, 
      resources={r"/*": {
-         "origins": [
-             "http://localhost:3000",
-             "http://127.0.0.1:3000",
-             "http://localhost:5173",
-             "http://predictive-ops-frontend.s3-website.eu-north-1.amazonaws.com/",
-             "http://predictive-ops-frontend.s3-website.eu-north-1.amazonaws.com"
-         ],
+         "origins": "*",
          "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
          "allow_headers": ["Content-Type", "Authorization"],
          "expose_headers": ["Content-Type", "Authorization"],
