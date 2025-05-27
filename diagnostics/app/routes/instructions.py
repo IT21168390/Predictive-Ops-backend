@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from ..extensions import mongo
 from bson.objectid import ObjectId
 
-instructions_bp = Blueprint('instructions', __name__, url_prefix='/instructions')
+instructions_bp = Blueprint('instructions', __name__)
 
 @instructions_bp.route('/add', methods=['POST'])
 def add_instruction():

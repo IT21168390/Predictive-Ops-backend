@@ -57,13 +57,13 @@ from diagnostics.app.routes.model_matrix import model_matrix_bp
 from diagnostics.app.routes.instructions import instructions_bp
 
 # Register Flask blueprints
-flask_app.register_blueprint(analytics_bp)
-flask_app.register_blueprint(correlations_bp)
-flask_app.register_blueprint(diagnostics_bp)
-flask_app.register_blueprint(failure_analysis_bp)
-flask_app.register_blueprint(feature_importance_bp)
-flask_app.register_blueprint(model_matrix_bp)
-flask_app.register_blueprint(instructions_bp)
+flask_app.register_blueprint(analytics_bp, url_prefix='/analytics')
+flask_app.register_blueprint(correlations_bp, url_prefix='/correlations')
+flask_app.register_blueprint(diagnostics_bp, url_prefix='/diagnostics')
+flask_app.register_blueprint(failure_analysis_bp, url_prefix='/failure-analysis')
+flask_app.register_blueprint(feature_importance_bp, url_prefix='/model')
+flask_app.register_blueprint(model_matrix_bp, url_prefix='/metrics')
+flask_app.register_blueprint(instructions_bp, url_prefix='/instructions')
 
 # Configure MongoDB
 flask_app.config["MONGO_URI"] = "mongodb+srv://sarangagunasekara20:saranga20@cluster0.tnwfav4.mongodb.net/research_db"
@@ -155,16 +155,6 @@ async def connect(sid, environ):
 @sio.event
 async def disconnect(sid):
     print(f"Client disconnected: {sid}")
-
-# Flask OPTIONS request handler
-@flask_app.before_request
-def handle_preflight():
-    if request.method == "OPTIONS":
-        response = make_response()
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
-        response.headers.add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
-        return response
 
 def run_flask():
     flask_app.run(host='0.0.0.0', port=5000, debug=False)

@@ -5,7 +5,7 @@ from ..utils.data_loader import load_dataset
 from ..services.fuzzy_logic import diagnose_extended
 import requests
 
-diagnostics_bp = Blueprint('diagnostics', __name__, url_prefix='/diagnostics')
+diagnostics_bp = Blueprint('diagnostics', __name__)
 
 
 @diagnostics_bp.route('/diagnose', methods=['POST'])

@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import os
 
-model_matrix_bp = Blueprint('model_matrix', __name__, url_prefix='/metrics')
+model_matrix_bp = Blueprint('model_matrix', __name__)
 service = FailureAnalysisService()
 
 # Configure paths and load model/data
