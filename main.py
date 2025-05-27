@@ -14,6 +14,7 @@ import sys
 import os
 from diagnostics.app.extensions import mongo
 from pymongo.errors import ConnectionFailure
+from diagnostics.middleware.cors import add_cors_middleware
 
 # Add the project root to Python path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -36,15 +37,8 @@ fast_app.add_middleware(
 # Create Flask app for analytics and model serving
 flask_app = Flask(__name__)
 
-# Configure CORS for Flask
-CORS(flask_app, 
-     resources={r"/*": {
-         "origins": "*",
-         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-         "allow_headers": ["Content-Type", "Authorization"],
-         "expose_headers": ["Content-Type", "Authorization"],
-         "supports_credentials": True
-     }})
+# Add CORS middleware for Flask
+add_cors_middleware(flask_app)
 
 # Socket.IO setup
 sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins="*")
